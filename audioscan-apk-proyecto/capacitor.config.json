@@ -1,0 +1,6 @@
+{
+  "appId": "com.audioscan.app",
+  "appName": "AudioScan",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
