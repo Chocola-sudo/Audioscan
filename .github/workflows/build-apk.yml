@@ -1,0 +1,50 @@
+name: Compilar APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      modelos:
+        description: "Modelos Whisper a incluir (tiny base small)"
+        default: "small"
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Descargar librería y modelos Whisper dentro de la app
+        env:
+          DESTINO: www
+        run: python3 descargar.py lib ${{ github.event.inputs.modelos || 'small' }}
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Crear proyecto Android
+        run: npx cap add android
+
+      - name: Parchar permisos, servicio y memoria
+        run: python3 tools/parchar_android.py
+
+      - name: Sincronizar
+        run: npx cap sync android
+
+      - name: Compilar APK
+        working-directory: android
+        run: |
+          export JAVA_HOME="$JAVA_HOME_17_X64"
+          export PATH="$JAVA_HOME/bin:$PATH"
+          java -version
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+
+      - name: Subir APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AudioScan-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
