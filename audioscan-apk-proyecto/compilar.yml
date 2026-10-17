@@ -1,0 +1,28 @@
+name: Compilar APK
+on:
+  workflow_dispatch:
+    inputs:
+      modelo:
+        description: 'modelo whisper'
+        default: 'small'
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ver que archivos hay
+        run: |
+          pwd
+          ls -la
+          find . -name "descargar.py" -type f
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt || true
+          
+      - name: Correr descarga
+        run: python3 ./descargar.py lib ${{ inputs.modelo || 'small' }}
