@@ -17,6 +17,11 @@ jobs:
         with:
           node-version: 20
 
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
       - name: Descargar librería y modelos Whisper dentro de la app
         env:
           DESTINO: www
@@ -37,17 +42,10 @@ jobs:
       - name: Compilar APK
         working-directory: android
         run: |
-          export JAVA_HOME="$JAVA_HOME_17_X64"
-          export PATH="$JAVA_HOME/bin:$PATH"
-          java -version
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
       - name: Subir APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: AudioScan-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
         uses: actions/upload-artifact@v4
         with:
           name: AudioScan-apk
